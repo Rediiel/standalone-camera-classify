@@ -1,0 +1,28 @@
+[project]
+name = "standalone-camera-classify"
+version = "0.1.0"
+description = "Tools to classify object that you show to your device camera"
+authors = [
+    {name = "Rediil"}
+]
+keywords = ["AI", "CLI", "image-processing"]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "numpy==2.2.4",
+    "opencv-python==4.12.0.88",
+    "joblib>=1.5.2,<2.0.0",
+    "scikit-image>=0.25.2,<0.26.0",
+    "scikit-learn==1.7.2",
+    "pytest ==  8.4.2"
+]
+
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+camera_classify = "standalone_camera_classify:main"
+test = "tests.runtest:main"
