@@ -1,0 +1,215 @@
+{
+  "train_accuracy": 1.0,
+  "train_classification_report": {
+    "backpack": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 8.0
+    },
+    "bag": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 26.0
+    },
+    "gabriel": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 22.0
+    },
+    "glasses": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 16.0
+    },
+    "headset": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 8.0
+    },
+    "keyboard": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 16.0
+    },
+    "laptop": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 8.0
+    },
+    "monitor": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 16.0
+    },
+    "mouse": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 8.0
+    },
+    "pen": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 11.0
+    },
+    "accuracy": 1.0,
+    "macro avg": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 139.0
+    },
+    "weighted avg": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 139.0
+    }
+  },
+  "test_accuracy": 1.0,
+  "test_classification_report": {
+    "backpack": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 2.0
+    },
+    "bag": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 6.0
+    },
+    "gabriel": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 6.0
+    },
+    "glasses": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 4.0
+    },
+    "headset": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 2.0
+    },
+    "keyboard": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 4.0
+    },
+    "laptop": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 2.0
+    },
+    "monitor": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 4.0
+    },
+    "mouse": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 2.0
+    },
+    "pen": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 3.0
+    },
+    "accuracy": 1.0,
+    "macro avg": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 35.0
+    },
+    "weighted avg": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 35.0
+    }
+  },
+  "dataset": {
+    "classes": [
+      "backpack",
+      "bag",
+      "gabriel",
+      "glasses",
+      "headset",
+      "keyboard",
+      "laptop",
+      "monitor",
+      "mouse",
+      "pen"
+    ],
+    "num_classes": 10,
+    "num_samples": 174,
+    "sample_shape": [
+      8100
+    ]
+  },
+  "start_time": "2025-10-24T18:52:34",
+  "end_time": "2025-10-24T18:58:58",
+  "settings_snapshot": {
+    "ALLOW_EMPTY_CLASSES": false,
+    "COLOR_MODE": "rgb",
+    "FEATURE_METHOD": "hog",
+    "HIST_BINS_PER_CHANNEL": 16,
+    "HIST_RANGE": [
+      0,
+      256
+    ],
+    "HOG_BLOCK_NORM": "L2-Hys",
+    "HOG_CELLS_PER_BLOCK": [
+      2,
+      2
+    ],
+    "HOG_ORIENTATIONS": 9,
+    "HOG_PIXELS_PER_CELL": [
+      8,
+      8
+    ],
+    "HOG_TRANSFORM_SQRT": true,
+    "IMAGE_SIZE": [
+      128,
+      128
+    ],
+    "INPUT_DIR": "input",
+    "LABELS_FILENAME": "label_encoder.joblib",
+    "MIN_IMAGES_PER_CLASS": 3,
+    "MODEL_FILENAME": "image_model.joblib",
+    "MODEL_TYPE": "svm",
+    "OUTPUT_DIR": "output",
+    "RANDOM_STATE": 42,
+    "REPORT_FILENAME": "training_report.json",
+    "RF_MAX_DEPTH": null,
+    "RF_N_ESTIMATORS": 100,
+    "STRATIFY": true,
+    "SVM_C": 1.0,
+    "SVM_MAX_ITER": 10000,
+    "TEST_SIZE": 0.2,
+    "VERBOSE": true
+  }
+}
