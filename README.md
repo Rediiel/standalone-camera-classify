@@ -34,7 +34,7 @@ poetry run test
 ## How to build This Application
 
 ```bash
-poetry buid
+poetry build
 ```
 
 ## How to Run This Application
