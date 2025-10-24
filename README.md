@@ -19,8 +19,8 @@ The system can recognize the following classes:
 
 ## Installation
 ```bash
-git clone https://github.com/Rediiel/standalone_camera_classify.git
-cd standalone_camera_classify
+git clone https://github.com/Rediiel/standalone-camera-classify.git
+cd standalone-camera-classify
 poetry install
 ```
 
