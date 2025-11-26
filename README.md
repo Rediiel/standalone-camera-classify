@@ -43,3 +43,16 @@ poetry build
 poetry run camera_classify
 ```
 
+## Static Tests
+
+If you want to run static tests before commiting your code you can run:
+
+```bash
+poetry run black .
+poetry run flake8 .
+```
+
+You can automatise this tasks before commit by installing the pre-commit tool:
+```bash
+poetry run pre-commit install
+```
