@@ -1,0 +1,319 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="fr" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Référence du Module &mdash; Documentation camera_classify 1.0.0</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=05dadb3a"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/translations.js?v=e6b791cb"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Recherche" href="search.html" />
+    <link rel="prev" title="camera_classify documentation" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            camera_classify
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Rechercher docs" aria-label="Rechercher docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Référence du Module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#standalone_camera_classify.normalize_hog_block_norm"><code class="docutils literal notranslate"><span class="pre">normalize_hog_block_norm()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#standalone_camera_classify.extract_color_hist"><code class="docutils literal notranslate"><span class="pre">extract_color_hist()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#standalone_camera_classify.extract_raw"><code class="docutils literal notranslate"><span class="pre">extract_raw()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#standalone_camera_classify.extract_hog_features"><code class="docutils literal notranslate"><span class="pre">extract_hog_features()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#standalone_camera_classify.extract_features"><code class="docutils literal notranslate"><span class="pre">extract_features()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#standalone_camera_classify.infer_expected_feature_length"><code class="docutils literal notranslate"><span class="pre">infer_expected_feature_length()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#standalone_camera_classify.adjust_feature_len"><code class="docutils literal notranslate"><span class="pre">adjust_feature_len()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#standalone_camera_classify.scores_to_probabilities"><code class="docutils literal notranslate"><span class="pre">scores_to_probabilities()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#standalone_camera_classify.draw_label_band"><code class="docutils literal notranslate"><span class="pre">draw_label_band()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#standalone_camera_classify.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">camera_classify</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Référence du Module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/reference.rst.txt" rel="nofollow"> Afficher la source de la page</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-standalone_camera_classify">
+<span id="reference-du-module"></span><h1>Référence du Module<a class="headerlink" href="#module-standalone_camera_classify" title="Lien vers cette rubrique"></a></h1>
+<p>standalone_camera_classify.py</p>
+<p>Realtime webcam image classification using your pretrained model.</p>
+<ul class="simple">
+<li><p>Opens the laptop camera.</p></li>
+<li><p>Extracts features (HOG / color_hist / raw) the same way as training.</p></li>
+<li><p>Loads the trained model + label encoder from joblib files.</p></li>
+<li><p>If the model is confident about a class, shows a black band at the bottom
+with the class name in bold white sans-serif text.</p></li>
+<li><p>If not confident, no band is drawn.</p></li>
+</ul>
+<dl class="simple">
+<dt>Keys:</dt><dd><p>q / ESC → quit
+f       → toggle fullscreen (best effort)</p>
+</dd>
+</dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="standalone_camera_classify.normalize_hog_block_norm">
+<span class="sig-prename descclassname"><span class="pre">standalone_camera_classify.</span></span><span class="sig-name descname"><span class="pre">normalize_hog_block_norm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">candidate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#standalone_camera_classify.normalize_hog_block_norm" title="Lien vers cette définition"></a></dt>
+<dd><p>Normalise la chaîne de caractère du bloc HOG pour s’assurer qu’elle correspond
+à un type de normalisation valide (L1, L1-sqrt, L2-Hys).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Paramètres<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>candidate</strong> (<em>str</em>) – La chaîne de caractère représentant le type de normalisation du bloc.</p>
+</dd>
+<dt class="field-even">Renvoie<span class="colon">:</span></dt>
+<dd class="field-even"><p>Le type de normalisation standardisé (e.g., “L2-Hys”).</p>
+</dd>
+<dt class="field-odd">Type renvoyé<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="standalone_camera_classify.extract_color_hist">
+<span class="sig-prename descclassname"><span class="pre">standalone_camera_classify.</span></span><span class="sig-name descname"><span class="pre">extract_color_hist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img_bgr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#standalone_camera_classify.extract_color_hist" title="Lien vers cette définition"></a></dt>
+<dd><p>Calcule l’histogramme des couleurs de l’image.</p>
+<p>Le calcul est effectué sur un canal (gris) ou trois canaux (BGR) selon
+les paramètres du module <cite>settings</cite>. L’histogramme résultant est normalisé.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Paramètres<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>img_bgr</strong> (<em>np.ndarray</em>) – L’image d’entrée au format BGR (OpenCV).</p>
+</dd>
+<dt class="field-even">Renvoie<span class="colon">:</span></dt>
+<dd class="field-even"><p>Le vecteur des caractéristiques de l’histogramme des couleurs normalisé.</p>
+</dd>
+<dt class="field-odd">Type renvoyé<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="standalone_camera_classify.extract_raw">
+<span class="sig-prename descclassname"><span class="pre">standalone_camera_classify.</span></span><span class="sig-name descname"><span class="pre">extract_raw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img_bgr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#standalone_camera_classify.extract_raw" title="Lien vers cette définition"></a></dt>
+<dd><p>Extrait les caractéristiques brutes (pixels) de l’image.</p>
+<p>L’image est redimensionnée (implicitement dans <cite>main</cite>), convertie en niveaux
+de gris si nécessaire, aplatie en un vecteur et normalisée (0.0 à 1.0).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Paramètres<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>img_bgr</strong> (<em>np.ndarray</em>) – L’image d’entrée au format BGR (OpenCV).</p>
+</dd>
+<dt class="field-even">Renvoie<span class="colon">:</span></dt>
+<dd class="field-even"><p>Le vecteur de caractéristiques brut et normalisé.</p>
+</dd>
+<dt class="field-odd">Type renvoyé<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="standalone_camera_classify.extract_hog_features">
+<span class="sig-prename descclassname"><span class="pre">standalone_camera_classify.</span></span><span class="sig-name descname"><span class="pre">extract_hog_features</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img_bgr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#standalone_camera_classify.extract_hog_features" title="Lien vers cette définition"></a></dt>
+<dd><p>Calcule les caractéristiques Histogram of Oriented Gradients (HOG) de l’image.</p>
+<p>La méthode utilise scikit-image et dépend des paramètres HOG définis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Paramètres<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>img_bgr</strong> (<em>np.ndarray</em>) – L’image d’entrée au format BGR (OpenCV).</p>
+</dd>
+<dt class="field-even">Renvoie<span class="colon">:</span></dt>
+<dd class="field-even"><p>Le vecteur des caractéristiques HOG.</p>
+</dd>
+<dt class="field-odd">Type renvoyé<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+<dt class="field-even">Lève<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>RuntimeError</strong> – Si la bibliothèque scikit-image n’est pas disponible.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="standalone_camera_classify.extract_features">
+<span class="sig-prename descclassname"><span class="pre">standalone_camera_classify.</span></span><span class="sig-name descname"><span class="pre">extract_features</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img_bgr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#standalone_camera_classify.extract_features" title="Lien vers cette définition"></a></dt>
+<dd><p>Fonction principale d’extraction des caractéristiques basée sur la méthode
+définie dans <cite>settings.FEATURE_METHOD</cite> (“hog”, “color_hist”, ou “raw”).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Paramètres<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>img_bgr</strong> (<em>np.ndarray</em>) – L’image d’entrée au format BGR (OpenCV).</p>
+</dd>
+<dt class="field-even">Renvoie<span class="colon">:</span></dt>
+<dd class="field-even"><p>Le vecteur de caractéristiques extrait.</p>
+</dd>
+<dt class="field-odd">Type renvoyé<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+<dt class="field-even">Lève<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – Si la méthode d’extraction configurée est inconnue.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="standalone_camera_classify.infer_expected_feature_length">
+<span class="sig-prename descclassname"><span class="pre">standalone_camera_classify.</span></span><span class="sig-name descname"><span class="pre">infer_expected_feature_length</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pipeline</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#standalone_camera_classify.infer_expected_feature_length" title="Lien vers cette définition"></a></dt>
+<dd><p>Déduit la longueur attendue du vecteur de caractéristiques à partir
+du modèle de pipeline chargé (via le scaler ou les coefficients du classifieur).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Paramètres<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pipeline</strong> (<em>sklearn.pipeline.Pipeline ou classifieur</em>) – Le modèle chargé contenant les étapes d’entraînement.</p>
+</dd>
+<dt class="field-even">Renvoie<span class="colon">:</span></dt>
+<dd class="field-even"><p>La longueur attendue du vecteur de caractéristiques, ou None si elle ne peut être déduite.</p>
+</dd>
+<dt class="field-odd">Type renvoyé<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int ou None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="standalone_camera_classify.adjust_feature_len">
+<span class="sig-prename descclassname"><span class="pre">standalone_camera_classify.</span></span><span class="sig-name descname"><span class="pre">adjust_feature_len</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#standalone_camera_classify.adjust_feature_len" title="Lien vers cette définition"></a></dt>
+<dd><p>Ajuste la longueur du vecteur de caractéristiques (padding ou tronquage).</p>
+<p>L’action dépend de la valeur de <cite>settings.PAD_IF_MISMATCH</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Paramètres<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>feat</strong> (<em>np.ndarray</em>) – Le vecteur de caractéristiques extrait.</p></li>
+<li><p><strong>expected</strong> (<em>int</em>) – La longueur attendue du vecteur (déduite du modèle).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Renvoie<span class="colon">:</span></dt>
+<dd class="field-even"><p>Le vecteur de caractéristiques ajusté.</p>
+</dd>
+<dt class="field-odd">Type renvoyé<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+<dt class="field-even">Lève<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – Si la longueur ne correspond pas et que <cite>PAD_IF_MISMATCH</cite> est False.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="standalone_camera_classify.scores_to_probabilities">
+<span class="sig-prename descclassname"><span class="pre">standalone_camera_classify.</span></span><span class="sig-name descname"><span class="pre">scores_to_probabilities</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scores</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#standalone_camera_classify.scores_to_probabilities" title="Lien vers cette définition"></a></dt>
+<dd><p>Convertit les scores de décision (ou log-probabilités) d’un classifieur
+en probabilités (via la fonction logistique pour les modèles binaires, ou
+softmax pour les modèles multi-classes).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Paramètres<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>scores</strong> (<em>np.ndarray</em>) – Le score de décision du classifieur (1D pour binaire, 2D pour multi-classe).</p>
+</dd>
+<dt class="field-even">Renvoie<span class="colon">:</span></dt>
+<dd class="field-even"><p>Les probabilités converties.</p>
+</dd>
+<dt class="field-odd">Type renvoyé<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="standalone_camera_classify.draw_label_band">
+<span class="sig-prename descclassname"><span class="pre">standalone_camera_classify.</span></span><span class="sig-name descname"><span class="pre">draw_label_band</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame_bgr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#standalone_camera_classify.draw_label_band" title="Lien vers cette définition"></a></dt>
+<dd><p>Dessine une bande noire en bas de l’image avec le texte de la classe
+identifiée centré en blanc.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Paramètres<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>frame_bgr</strong> (<em>np.ndarray</em>) – L’image d’entrée (sera modifiée in-place).</p></li>
+<li><p><strong>text</strong> (<em>str</em>) – Le nom de la classe à afficher.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="standalone_camera_classify.main">
+<span class="sig-prename descclassname"><span class="pre">standalone_camera_classify.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#standalone_camera_classify.main" title="Lien vers cette définition"></a></dt>
+<dd><p>Fonction principale exécutant la boucle de classification en temps réel.</p>
+<p>Elle initialise la caméra, charge le modèle, extrait les caractéristiques
+de chaque image capturée et affiche le résultat de la classification
+si la confiance minimale est atteinte.</p>
+<p>Gère la fermeture propre de la caméra et des fenêtres.</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Pied de page">
+        <a href="index.html" class="btn btn-neutral float-left" title="camera_classify documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Précédent</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Droits d'auteur 2025, Mathys BAUCHET.</p>
+  </div>
+
+  Compilé avec <a href="https://www.sphinx-doc.org/">Sphinx</a> en utilisant un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">thème</a>
+    fourni par <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

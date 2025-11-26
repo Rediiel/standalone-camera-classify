@@ -51,6 +51,20 @@ logger = logging.getLogger("CameraClassify")
 
 
 def normalize_hog_block_norm(candidate: str) -> str:
+    """
+    Normalise la chaîne de caractère du bloc HOG pour s'assurer qu'elle correspond
+    à un type de normalisation valide (L1, L1-sqrt, L2-Hys).
+
+    Parameters
+    ----------
+    candidate : str
+        La chaîne de caractère représentant le type de normalisation du bloc.
+
+    Returns
+    -------
+    str
+        Le type de normalisation standardisé (e.g., 'L2-Hys').
+    """
     if not candidate:
         return "L2-Hys"
     s = str(candidate).strip().lower()
@@ -62,6 +76,22 @@ def normalize_hog_block_norm(candidate: str) -> str:
 
 
 def extract_color_hist(img_bgr: np.ndarray) -> np.ndarray:
+    """
+    Calcule l'histogramme des couleurs de l'image.
+
+    Le calcul est effectué sur un canal (gris) ou trois canaux (BGR) selon
+    les paramètres du module `settings`. L'histogramme résultant est normalisé.
+
+    Parameters
+    ----------
+    img_bgr : np.ndarray
+        L'image d'entrée au format BGR (OpenCV).
+
+    Returns
+    -------
+    np.ndarray
+        Le vecteur des caractéristiques de l'histogramme des couleurs normalisé.
+    """
     if settings.COLOR_MODE.lower() == "gray":
         gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
         hist = (
@@ -97,6 +127,22 @@ def extract_color_hist(img_bgr: np.ndarray) -> np.ndarray:
 
 
 def extract_raw(img_bgr: np.ndarray) -> np.ndarray:
+    """
+    Extrait les caractéristiques brutes (pixels) de l'image.
+
+    L'image est redimensionnée (implicitement dans `main`), convertie en niveaux
+    de gris si nécessaire, aplatie en un vecteur et normalisée (0.0 à 1.0).
+
+    Parameters
+    ----------
+    img_bgr : np.ndarray
+        L'image d'entrée au format BGR (OpenCV).
+
+    Returns
+    -------
+    np.ndarray
+        Le vecteur de caractéristiques brut et normalisé.
+    """
     if settings.COLOR_MODE.lower() == "gray":
         gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
         arr = gray.astype(np.float32) / 255.0
@@ -107,6 +153,26 @@ def extract_raw(img_bgr: np.ndarray) -> np.ndarray:
 
 
 def extract_hog_features(img_bgr: np.ndarray) -> np.ndarray:
+    """
+    Calcule les caractéristiques Histogram of Oriented Gradients (HOG) de l'image.
+
+    La méthode utilise scikit-image et dépend des paramètres HOG définis.
+
+    Parameters
+    ----------
+    img_bgr : np.ndarray
+        L'image d'entrée au format BGR (OpenCV).
+
+    Returns
+    -------
+    np.ndarray
+        Le vecteur des caractéristiques HOG.
+
+    Raises
+    ------
+    RuntimeError
+        Si la bibliothèque scikit-image n'est pas disponible.
+    """
     if not SKIMAGE_OK:
         logger.error(
             "scikit-image est requis pour l'extraction de HOG "
@@ -129,6 +195,25 @@ def extract_hog_features(img_bgr: np.ndarray) -> np.ndarray:
 
 
 def extract_features(img_bgr: np.ndarray) -> np.ndarray:
+    """
+    Fonction principale d'extraction des caractéristiques basée sur la méthode
+    définie dans `settings.FEATURE_METHOD` ('hog', 'color_hist', ou 'raw').
+
+    Parameters
+    ----------
+    img_bgr : np.ndarray
+        L'image d'entrée au format BGR (OpenCV).
+
+    Returns
+    -------
+    np.ndarray
+        Le vecteur de caractéristiques extrait.
+
+    Raises
+    ------
+    ValueError
+        Si la méthode d'extraction configurée est inconnue.
+    """
     method = settings.FEATURE_METHOD.lower()
     try:
         if method == "hog":
@@ -151,6 +236,21 @@ def extract_features(img_bgr: np.ndarray) -> np.ndarray:
 
 
 def infer_expected_feature_length(pipeline):
+    """
+    Déduit la longueur attendue du vecteur de caractéristiques à partir
+    du modèle de pipeline chargé (via le scaler ou les coefficients du classifieur).
+
+    Parameters
+    ----------
+    pipeline : sklearn.pipeline.Pipeline ou classifieur
+        Le modèle chargé contenant les étapes d'entraînement.
+
+    Returns
+    -------
+    int ou None
+        La longueur attendue du vecteur de caractéristiques,
+        ou None si elle ne peut être déduite.
+    """
     try:
         if hasattr(pipeline, "named_steps") and "scaler" in pipeline.named_steps:
             scaler = pipeline.named_steps["scaler"]
@@ -171,6 +271,28 @@ def infer_expected_feature_length(pipeline):
 
 
 def adjust_feature_len(feat: np.ndarray, expected: int) -> np.ndarray:
+    """
+    Ajuste la longueur du vecteur de caractéristiques (padding ou tronquage).
+
+    L'action dépend de la valeur de `settings.PAD_IF_MISMATCH`.
+
+    Parameters
+    ----------
+    feat : np.ndarray
+        Le vecteur de caractéristiques extrait.
+    expected : int
+        La longueur attendue du vecteur (déduite du modèle).
+
+    Returns
+    -------
+    np.ndarray
+        Le vecteur de caractéristiques ajusté.
+
+    Raises
+    ------
+    ValueError
+        Si la longueur ne correspond pas et que `PAD_IF_MISMATCH` est False.
+    """
     f = np.asarray(feat, dtype=np.float32).ravel()
     if expected is None or f.size == expected:
         return f
@@ -198,6 +320,21 @@ def adjust_feature_len(feat: np.ndarray, expected: int) -> np.ndarray:
 
 
 def scores_to_probabilities(scores: np.ndarray) -> np.ndarray:
+    """
+    Convertit les scores de décision (ou log-probabilités) d'un classifieur
+    en probabilités (via la fonction logistique pour les modèles binaires, ou
+    softmax pour les modèles multi-classes).
+
+    Parameters
+    ----------
+    scores : np.ndarray
+        Le score de décision du classifieur (1D pour binaire, 2D pour multi-classe).
+
+    Returns
+    -------
+    np.ndarray
+        Les probabilités converties.
+    """
     s = np.asarray(scores)
     if s.ndim == 1:
         probs_pos = 1.0 / (1.0 + np.exp(-s))
@@ -211,6 +348,17 @@ def scores_to_probabilities(scores: np.ndarray) -> np.ndarray:
 
 
 def draw_label_band(frame_bgr: np.ndarray, text: str):
+    """
+    Dessine une bande noire en bas de l'image avec le texte de la classe
+    identifiée centré en blanc.
+
+    Parameters
+    ----------
+    frame_bgr : np.ndarray
+        L'image d'entrée (sera modifiée in-place).
+    text : str
+        Le nom de la classe à afficher.
+    """
     h, w = frame_bgr.shape[:2]
     font = cv2.FONT_HERSHEY_SIMPLEX
     (tw, th), baseline = cv2.getTextSize(
@@ -239,6 +387,15 @@ def draw_label_band(frame_bgr: np.ndarray, text: str):
 
 
 def main():
+    """
+    Fonction principale exécutant la boucle de classification en temps réel.
+
+    Elle initialise la caméra, charge le modèle, extrait les caractéristiques
+    de chaque image capturée et affiche le résultat de la classification
+    si la confiance minimale est atteinte.
+
+    Gère la fermeture propre de la caméra et des fenêtres.
+    """
     logger.info("Démarrage du script de classification en temps réel.")
 
     model_path = os.path.join(settings.MODEL_DIR, settings.MODEL_FILENAME)
