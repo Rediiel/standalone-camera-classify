@@ -118,7 +118,7 @@ La documentation de référence est générée à l'aide de **Sphinx** à partir
 
 ### Tutoriel
 
-Un tutoriel pas-à-pas simple pour le projet se trouve ici : [docs/tutorials/tutorial.md](https://www.google.com/search?q=./docs/tutorials/tutorial.md).
+Un tutoriel pas-à-pas simple pour le projet se trouve ici : [docs/tutorials/tutorial.md](./docs/tutorials/tutorial.md).
 
 
 
