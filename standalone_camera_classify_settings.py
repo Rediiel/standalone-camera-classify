@@ -4,11 +4,11 @@ MODEL_FILENAME = "image_model.joblib"
 LABELS_FILENAME = "label_encoder.joblib"
 
 # Image preprocessing (must match training)
-IMAGE_SIZE = (128, 128)   # width, height
-COLOR_MODE = "rgb"        # "rgb" or "gray"
+IMAGE_SIZE = (128, 128)  # width, height
+COLOR_MODE = "rgb"  # "rgb" or "gray"
 
 # Feature method (must match training)
-FEATURE_METHOD = "hog"    # "hog", "color_hist", "raw"
+FEATURE_METHOD = "hog"  # "hog", "color_hist", "raw"
 
 # HOG params
 HOG_ORIENTATIONS = 9
@@ -38,4 +38,3 @@ CAPTURE_HEIGHT = 480
 PAD_IF_MISMATCH = True
 VERBOSE = True
 WINDOW_TITLE = "Realtime Image Classification"
-

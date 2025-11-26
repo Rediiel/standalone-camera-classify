@@ -7,7 +7,7 @@ authors = [
 ]
 keywords = ["AI", "CLI", "image-processing"]
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.12.6,<3.13"
 dependencies = [
     "numpy==2.2.4",
     "opencv-python==4.12.0.88",
@@ -26,3 +26,18 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry.scripts]
 camera_classify = "standalone_camera_classify:main"
 test = "tests.runtest:main"
+
+[dependency-groups]
+dev = [
+    "flake8 (>=7.3.0,<8.0.0)",
+    "black (>=25.11.0,<26.0.0)",
+    "pre-commit (>=4.5.0,<5.0.0)"
+]
+
+
+[tool.black]
+line-length = 88
+
+[tool.isort]
+profile = "black"
+

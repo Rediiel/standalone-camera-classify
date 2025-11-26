@@ -18,14 +18,17 @@ Keys:
 
 import os
 import sys
-import time
 import cv2
 import numpy as np
 from joblib import load as joblib_load
 
+# AJOUT POUR LA TÂCHE 3 : Logging
+import logging
+
 try:
     from skimage.feature import hog
     from skimage.color import rgb2gray
+
     SKIMAGE_OK = True
 except Exception:
     SKIMAGE_OK = False
@@ -33,7 +36,19 @@ except Exception:
 import standalone_camera_classify_settings as settings
 
 
+# ----------------- Configuration du Logging (TÂCHE 3) -----------------
+# Configurer le logger avant tout usage
+logging.basicConfig(
+    level=logging.INFO,  # Niveau de base pour afficher les INFO, WARNING, ERROR
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+logger = logging.getLogger("CameraClassify")
+# ----------------------------------------------------------------------
+
+
 # ----------------- Feature extraction helpers -----------------
+
 
 def normalize_hog_block_norm(candidate: str) -> str:
     if not candidate:
@@ -49,17 +64,33 @@ def normalize_hog_block_norm(candidate: str) -> str:
 def extract_color_hist(img_bgr: np.ndarray) -> np.ndarray:
     if settings.COLOR_MODE.lower() == "gray":
         gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
-        hist = cv2.calcHist([gray], [0], None,
-                            [settings.HIST_BINS_PER_CHANNEL],
-                            [settings.HIST_RANGE[0], settings.HIST_RANGE[1]]).astype(np.float32).ravel()
+        hist = (
+            cv2.calcHist(
+                [gray],
+                [0],
+                None,
+                [settings.HIST_BINS_PER_CHANNEL],
+                [settings.HIST_RANGE[0], settings.HIST_RANGE[1]],
+            )
+            .astype(np.float32)
+            .ravel()
+        )
         return hist / hist.sum() if hist.sum() > 0 else hist
     else:
         chans = cv2.split(img_bgr)
         feats = []
         for ch in chans:
-            h = cv2.calcHist([ch], [0], None,
-                             [settings.HIST_BINS_PER_CHANNEL],
-                             [settings.HIST_RANGE[0], settings.HIST_RANGE[1]]).astype(np.float32).ravel()
+            h = (
+                cv2.calcHist(
+                    [ch],
+                    [0],
+                    None,
+                    [settings.HIST_BINS_PER_CHANNEL],
+                    [settings.HIST_RANGE[0], settings.HIST_RANGE[1]],
+                )
+                .astype(np.float32)
+                .ravel()
+            )
             feats.append(h)
         feat = np.concatenate(feats)
         return feat / feat.sum() if feat.sum() > 0 else feat
@@ -77,30 +108,46 @@ def extract_raw(img_bgr: np.ndarray) -> np.ndarray:
 
 def extract_hog_features(img_bgr: np.ndarray) -> np.ndarray:
     if not SKIMAGE_OK:
+        logger.error(
+            "scikit-image est requis pour l'extraction de HOG "
+            "mais n'est pas disponible."
+        )
         raise RuntimeError("scikit-image is required for HOG feature extraction.")
     img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
     gray = rgb2gray(img_rgb)
     block_norm = normalize_hog_block_norm(settings.HOG_BLOCK_NORM)
-    feats = hog(gray,
-                orientations=settings.HOG_ORIENTATIONS,
-                pixels_per_cell=settings.HOG_PIXELS_PER_CELL,
-                cells_per_block=settings.HOG_CELLS_PER_BLOCK,
-                block_norm=block_norm,
-                transform_sqrt=settings.HOG_TRANSFORM_SQRT,
-                feature_vector=True)
+    feats = hog(
+        gray,
+        orientations=settings.HOG_ORIENTATIONS,
+        pixels_per_cell=settings.HOG_PIXELS_PER_CELL,
+        cells_per_block=settings.HOG_CELLS_PER_BLOCK,
+        block_norm=block_norm,
+        transform_sqrt=settings.HOG_TRANSFORM_SQRT,
+        feature_vector=True,
+    )
     return feats.astype(np.float32)
 
 
 def extract_features(img_bgr: np.ndarray) -> np.ndarray:
     method = settings.FEATURE_METHOD.lower()
-    if method == "hog":
-        return extract_hog_features(img_bgr)
-    elif method == "color_hist":
-        return extract_color_hist(img_bgr)
-    elif method == "raw":
-        return extract_raw(img_bgr)
-    else:
-        raise ValueError(f"Unknown FEATURE_METHOD: {settings.FEATURE_METHOD}")
+    try:
+        if method == "hog":
+            return extract_hog_features(img_bgr)
+        elif method == "color_hist":
+            return extract_color_hist(img_bgr)
+        elif method == "raw":
+            return extract_raw(img_bgr)
+        else:
+            logger.error(
+                "FEATURE_METHOD inconnu dans les settings : "
+                f"{settings.FEATURE_METHOD}"
+            )
+            raise ValueError(f"Unknown FEATURE_METHOD: {settings.FEATURE_METHOD}")
+    except Exception as e:
+        logger.error(
+            f"Échec de l'extraction des caractéristiques pour la méthode {method}: {e}"
+        )
+        raise e
 
 
 def infer_expected_feature_length(pipeline):
@@ -128,11 +175,25 @@ def adjust_feature_len(feat: np.ndarray, expected: int) -> np.ndarray:
     if expected is None or f.size == expected:
         return f
     if f.size < expected and settings.PAD_IF_MISMATCH:
+        logger.warning(
+            f"Remplissage des caractéristiques: longueur attendue {expected}, "
+            f"trouvée {f.size}."
+        )
         out = np.zeros((expected,), dtype=np.float32)
-        out[:f.size] = f
+        out[: f.size] = f
         return out
     if f.size > expected and settings.PAD_IF_MISMATCH:
+        logger.warning(
+            f"Tronquage des caractéristiques: longueur attendue {expected}, "
+            f"trouvée {f.size}."
+        )
         return f[:expected]
+
+    # Correction de l'erreur F541 (string simple) et E501
+    logger.error(
+        "Longueur des caractéristiques incompatible: taille "
+        f"{f.size} != attendue {expected}. (PAD_IF_MISMATCH est Faux)"
+    )
     raise ValueError(f"feature length {f.size} != expected {expected}")
 
 
@@ -148,38 +209,66 @@ def scores_to_probabilities(scores: np.ndarray) -> np.ndarray:
 
 # ----------------- Drawing helper -----------------
 
+
 def draw_label_band(frame_bgr: np.ndarray, text: str):
     h, w = frame_bgr.shape[:2]
     font = cv2.FONT_HERSHEY_SIMPLEX
-    (tw, th), baseline = cv2.getTextSize(text, font,
-                                         settings.BAND_BASE_FONT_SCALE,
-                                         settings.BAND_FONT_THICKNESS)
+    (tw, th), baseline = cv2.getTextSize(
+        text, font, settings.BAND_BASE_FONT_SCALE, settings.BAND_FONT_THICKNESS
+    )
     pad = settings.BAND_VERTICAL_PADDING
     band_h = th + baseline + 2 * pad
     y1 = h - band_h
     cv2.rectangle(frame_bgr, (0, y1), (w, h), (0, 0, 0), thickness=-1)
     x = (w - tw) // 2
     y = y1 + pad + th
-    cv2.putText(frame_bgr, text, (x, y), font,
-                settings.BAND_BASE_FONT_SCALE,
-                (255, 255, 255),
-                settings.BAND_FONT_THICKNESS,
-                cv2.LINE_AA)
+    # Correction E501 ici en cassant la ligne
+    cv2.putText(
+        frame_bgr,
+        text,
+        (x, y),
+        font,
+        settings.BAND_BASE_FONT_SCALE,
+        (255, 255, 255),
+        settings.BAND_FONT_THICKNESS,
+        cv2.LINE_AA,
+    )
 
 
 # ----------------- Main loop -----------------
 
+
 def main():
+    logger.info("Démarrage du script de classification en temps réel.")
+
     model_path = os.path.join(settings.MODEL_DIR, settings.MODEL_FILENAME)
     labels_path = os.path.join(settings.MODEL_DIR, settings.LABELS_FILENAME)
+
+    # REMPLACEMENT du print() par logger.error()
     if not os.path.isfile(model_path) or not os.path.isfile(labels_path):
-        print("[ERROR] Model or label encoder not found.")
+        # Correction E501: Coupure du long message
+        logger.error(
+            "Modèle ou encodeur de labels non trouvés aux chemins : "
+            f"{model_path} / {labels_path}"
+        )
         sys.exit(1)
 
+    logger.info("Modèle et encodeur de labels trouvés. Chargement...")
+
     cap = cv2.VideoCapture(settings.CAMERA_INDEX, cv2.CAP_ANY)
+
+    # REMPLACEMENT du print() par logger.error()
     if not cap.isOpened():
-        print("[ERROR] Could not open camera.")
+        logger.error(
+            f"Impossible d'ouvrir la caméra (index {settings.CAMERA_INDEX}). "
+            "Vérifiez la connexion."
+        )
         sys.exit(1)
+
+    logger.info(
+        "Caméra ouverte. Résolution demandée: "
+        f"{settings.CAPTURE_WIDTH}x{settings.CAPTURE_HEIGHT}."
+    )
 
     if settings.CAPTURE_WIDTH and settings.CAPTURE_HEIGHT:
         cap.set(cv2.CAP_PROP_FRAME_WIDTH, settings.CAPTURE_WIDTH)
@@ -187,6 +276,9 @@ def main():
 
     pipeline = joblib_load(model_path)
     label_enc = joblib_load(labels_path)
+
+    logger.info("Pipeline de classification chargé avec succès.")
+
     try:
         classes = list(label_enc.classes_)
     except Exception:
@@ -197,12 +289,21 @@ def main():
     window_name = settings.WINDOW_TITLE
     cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
 
+    logger.info(
+        "Démarrage de la boucle de traitement de la vidéo "
+        "(Appuyez sur 'q' ou 'ESC' pour quitter)."
+    )
+
     while True:
         ok, frame_bgr = cap.read()
         if not ok:
+            logger.warning(
+                "Échec de la lecture d'une image de la caméra. Arrêt de la boucle."
+            )
             break
 
         resized = cv2.resize(frame_bgr, settings.IMAGE_SIZE)
+
         feat = extract_features(resized)
         feat = adjust_feature_len(feat, expected_len)
         X = feat.reshape(1, -1)
@@ -217,7 +318,8 @@ def main():
                     probs = scores_to_probabilities(np.atleast_2d(scores))
                 else:
                     preds = pipeline.predict(X)
-        except Exception:
+        except Exception as e:
+            logger.error(f"Erreur lors de la prédiction du modèle : {e}")
             pass
 
         if probs is None and preds is not None:
@@ -232,18 +334,21 @@ def main():
             prob = float(row[idx])
             if prob >= settings.MIN_CONFIDENCE:
                 class_name = classes[idx] if idx < len(classes) else str(idx)
+                logger.debug(
+                    "Classification %s avec probabilité %.2f" % (class_name, prob)
+                )
                 draw_label_band(frame_bgr, class_name)
 
         # Show the frame
         try:
             cv2.imshow(window_name, frame_bgr)
         except cv2.error:
+            logger.warning("Fenêtre d'affichage détruite entre les boucles.")
             break  # window was destroyed between loops
 
         # Pump GUI events first so window state updates
         key = cv2.waitKey(1) & 0xFF
 
-        # Robustly detect that the window was closed
         closed = False
         try:
             if cv2.getWindowProperty(window_name, cv2.WND_PROP_VISIBLE) < 1:
@@ -270,14 +375,14 @@ def main():
             break
 
         # Still allow keyboard quit
-        if key in (27, ord('q')):  # ESC or q
+        if key in (27, ord("q")):  # ESC or q
+            logger.info("Signal de fermeture reçu par l'utilisateur.")
             break
-
 
     cap.release()
     cv2.destroyAllWindows()
+    logger.info("Arrêt de la caméra et fin de l'exécution du programme.")
 
 
 if __name__ == "__main__":
     main()
-
