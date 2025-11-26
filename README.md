@@ -56,3 +56,4 @@ You can automatise this tasks before commit by installing the pre-commit tool:
 ```bash
 poetry run pre-commit install
 ```
+
