@@ -112,7 +112,7 @@ La documentation de référence est générée à l'aide de **Sphinx** à partir
     ```
 2.  Générez les pages HTML :
     ```bash
-    make html
+    poetry make html
     ```
     Les fichiers générés se trouveront dans `docs/_build/html`.
 

@@ -1,0 +1,44 @@
+name: CI Quality & Tests
+
+on: [push, pull_request]
+
+jobs:
+  quality-and-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Poetry
+        run: pipx install poetry
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'poetry'
+
+      - name: Install dependencies
+        run: poetry install
+
+      # 1/5 - Matrix & Unit Tests
+      - name: Run unit tests
+        run: poetry run test
+
+      # 1/5 - Analysis (Style & Secrets)
+      - name: Lint with Black
+        run: poetry run black --check .
+      
+      - name: Lint with Flake8
+        run: poetry run flake8 .
+
+      - name: Secret Scanning
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: --only-verified
