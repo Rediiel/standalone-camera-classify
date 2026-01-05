@@ -3,7 +3,7 @@ name: Deploy Documentation
 on:
   push:
     branches:
-      - main # Vérifie si ta branche s'appelle master ou main
+      - main # Déclenche la publication de la doc à chaque push sur la branche main
 
 permissions:
   contents: read
